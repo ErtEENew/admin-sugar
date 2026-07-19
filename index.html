@@ -109,22 +109,15 @@
         </div>
     </div>
 
-    <!-- FIREBASE LOGIC -->
+   <!-- FIREBASE LOGIC -->
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
         import { getFirestore, collection, onSnapshot, doc, setDoc, deleteDoc, updateDoc, writeBatch, getDocs } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
         import { getAuth, signInWithEmailAndPassword, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js";
 
-        // !!! PASTE YOUR CONFIG HERE !!!
+        // !!! PASTE YOUR EXACT FIREBASE CONFIG HERE !!!
         const firebaseConfig = {
-            apiKey: "AIzaSyCvn_mTEQzb3YVptAnFluDuUYi8IVUx520",
-            authDomain: "carnival-of-carnage.firebaseapp.com",
-            projectId: "carnival-of-carnage",
-            storageBucket: "carnival-of-carnage.firebasestorage.app",
-            messagingSenderId: "637057918873",
-            appId: "1:637057918873:web:f043f33ab95848e0331508",
-            measurementId: "G-DR98DQMMGB"
-
+           // YOUR FIREBASE DETAILS HERE
         };
 
         const app = initializeApp(firebaseConfig);
@@ -178,16 +171,29 @@
                 return;
             }
 
-            // Determine max round to know how many containers to draw
             const maxRound = Math.max(...window.matches.map(m => m.round));
             
-            // Build Match Dropdown Options (for drawing lines)
-            const matchOptions = `<option value="">-- No Connecting Line --</option>` + 
-                window.matches.sort((a,b) => a.round - b.round).map(m => `<option value="${m.id}">Feeds from Match ${m.id.substring(1)} (R${m.round})</option>`).join('');
-
-            // Draw each round
             for(let r = 1; r <= maxRound; r++) {
                 const roundMatches = window.matches.filter(m => m.round === r).sort((a,b) => parseInt(a.id.substring(1)) - parseInt(b.id.substring(1)));
+                
+                // --- DYNAMIC FILTERING: Find eligible players for this round ---
+                let eligiblePlayers = ["TBD", "BYE"];
+                if (r === 1) {
+                    eligiblePlayers = [...window.players]; // Round 1: Show Everyone
+                } else {
+                    // Round 2+: Extract ONLY the winners of the previous round
+                    const prevMatches = window.matches.filter(m => m.round === r - 1 && m.state === 'complete');
+                    prevMatches.forEach(m => {
+                        let winner = null;
+                        if (m.s1 > m.s2) winner = m.p1;
+                        else if (m.s2 > m.s1) winner = m.p2;
+                        else if (m.p2 === "BYE") winner = m.p1;
+                        else if (m.p1 === "BYE") winner = m.p2;
+                        
+                        if (winner && winner !== "TBD" && winner !== "BYE") eligiblePlayers.push(winner);
+                    });
+                    eligiblePlayers = [...new Set(eligiblePlayers)]; // Remove duplicates
+                }
                 
                 let html = `
                 <div class="round-container">
@@ -199,11 +205,34 @@
                 `;
 
                 roundMatches.forEach(match => {
-                    const p1Opts = window.players.map(p => `<option value="${p}" ${match.p1 === p ? 'selected':''}>${p}</option>`).join('');
-                    const p2Opts = window.players.map(p => `<option value="${p}" ${match.p2 === p ? 'selected':''}>${p}</option>`).join('');
+                    const isComplete = match.state === 'complete';
+                    const pDisabled = isComplete ? 'disabled' : '';
+                    
+                    // Helper to build options (keeps current player visible even if bracket changed)
+                    const buildOpts = (selected) => {
+                        const opts = [...eligiblePlayers];
+                        if (selected && !opts.includes(selected)) opts.push(selected);
+                        return opts.map(p => `<option value="${p}" ${selected === p ? 'selected':''}>${p}</option>`).join('');
+                    };
+
+                    const p1Opts = buildOpts(match.p1);
+                    const p2Opts = buildOpts(match.p2);
+                    
+                    let winnerHTML = '';
+                    if (isComplete) {
+                        let winner = "TBD";
+                        if (match.s1 > match.s2) winner = match.p1;
+                        else if (match.s2 > match.s1) winner = match.p2;
+                        else if (match.p2 === "BYE") winner = match.p1;
+                        else if (match.p1 === "BYE") winner = match.p2;
+                        
+                        if (winner !== "TBD") {
+                            winnerHTML = `<div style="margin-top: 1rem; color: var(--auric-gold); font-family: 'Rajdhani'; font-size: 1.2rem; font-weight: bold; text-align: center; border-top: 1px solid #2a2a2c; padding-top: 0.5rem;">🏆 WINNER: ${winner}</div>`;
+                        }
+                    }
                     
                     html += `
-                        <div class="match-card">
+                        <div class="match-card" style="${isComplete ? 'border-color: var(--auric-gold); box-shadow: 0 0 15px rgba(207,170,75,0.15);' : ''}">
                             <div class="match-card-header">
                                 <h4>Match ${match.id.substring(1)}</h4>
                                 <button class="btn-delete-match" data-id="${match.id}">Delete</button>
@@ -212,32 +241,22 @@
                             <div class="match-row">
                                 <label>Participant 1</label>
                                 <div class="input-group">
-                                    <select id="${match.id}-p1">${p1Opts}</select>
-                                    <input type="number" id="${match.id}-s1" value="${match.s1}">
+                                    <select id="${match.id}-p1" ${pDisabled}>${p1Opts}</select>
+                                    <input type="number" id="${match.id}-s1" value="${match.s1}" ${pDisabled}>
                                 </div>
-                                <select id="${match.id}-p1-source" class="full-select" style="margin-top:0.3rem;">
-                                    ${matchOptions.replace(`value="${match.p1_source}"`, `value="${match.p1_source}" selected`)}
-                                </select>
                             </div>
 
                             <div class="match-row">
                                 <label>Participant 2</label>
                                 <div class="input-group">
-                                    <select id="${match.id}-p2">${p2Opts}</select>
-                                    <input type="number" id="${match.id}-s2" value="${match.s2}">
+                                    <select id="${match.id}-p2" ${pDisabled}>${p2Opts}</select>
+                                    <input type="number" id="${match.id}-s2" value="${match.s2}" ${pDisabled}>
                                 </div>
-                                <select id="${match.id}-p2-source" class="full-select" style="margin-top:0.3rem;">
-                                    ${matchOptions.replace(`value="${match.p2_source}"`, `value="${match.p2_source}" selected`)}
-                                </select>
                             </div>
 
-                            <select id="${match.id}-state" class="full-select">
-                                <option value="upcoming" ${match.state === 'upcoming'?'selected':''}>Status: Upcoming (No Outline)</option>
-                                <option value="pending" ${match.state === 'pending'?'selected':''}>Status: Active (Red Outline)</option>
-                                <option value="complete" ${match.state === 'complete'?'selected':''}>Status: Complete (Gold Highlights)</option>
-                            </select>
+                            ${winnerHTML}
                             
-                            <button class="btn-update" data-id="${match.id}">SAVE MATCH</button>
+                            <button class="btn-update" data-id="${match.id}">${isComplete ? 'UNLOCK / EDIT MATCH' : 'SAVE MATCH'}</button>
                         </div>
                     `;
                 });
@@ -272,15 +291,51 @@
 
         async function updateMatch(e) {
             const id = e.target.dataset.id;
+            const match = window.matches.find(m => m.id === id);
+
+            // If match is locked, clicking unlocks it (resets score so you can edit)
+            if (match.state === 'complete' && e.target.innerText === "UNLOCK / EDIT MATCH") {
+                await updateDoc(doc(db, "matches", id), { s1: 0, s2: 0, state: "pending" });
+                return;
+            }
+
+            const p1 = document.getElementById(`${id}-p1`).value;
+            const p2 = document.getElementById(`${id}-p2`).value;
+            const s1 = parseInt(document.getElementById(`${id}-s1`).value) || 0;
+            const s2 = parseInt(document.getElementById(`${id}-s2`).value) || 0;
+
+            // --- AUTOMATE STATE ---
+            let state = "upcoming";
+            if (p1 !== "TBD" || p2 !== "TBD") state = "pending";
+            // Complete if someone scores higher, OR someone has a BYE
+            if (s1 > s2 || s2 > s1 || (p1 !== "TBD" && p2 === "BYE") || (p2 !== "TBD" && p1 === "BYE")) {
+                state = "complete";
+            }
+
+            // --- AUTOMATE CONNECTIONS (BLOODLINES) ---
+            const findSource = (playerName) => {
+                if (!playerName || playerName === "TBD" || playerName === "BYE") return "";
+                const prev = window.matches.find(m => {
+                    if (m.round !== match.round - 1 || m.state !== 'complete') return false;
+                    let winner = "TBD";
+                    if (m.s1 > m.s2) winner = m.p1;
+                    else if (m.s2 > m.s1) winner = m.p2;
+                    else if (m.p2 === "BYE") winner = m.p1;
+                    else if (m.p1 === "BYE") winner = m.p2;
+                    return winner === playerName;
+                });
+                return prev ? prev.id : "";
+            };
+
+            const p1_source = findSource(p1);
+            const p2_source = findSource(p2);
+
             await updateDoc(doc(db, "matches", id), {
-                p1: document.getElementById(`${id}-p1`).value,
-                p1_source: document.getElementById(`${id}-p1-source`).value,
-                s1: parseInt(document.getElementById(`${id}-s1`).value) || 0,
-                p2: document.getElementById(`${id}-p2`).value,
-                p2_source: document.getElementById(`${id}-p2-source`).value,
-                s2: parseInt(document.getElementById(`${id}-s2`).value) || 0,
-                state: document.getElementById(`${id}-state`).value
+                p1, p1_source, s1,
+                p2, p2_source, s2,
+                state
             });
+
             e.target.innerText = "SAVED!"; setTimeout(() => e.target.innerText = "SAVE MATCH", 1000);
         }
 
