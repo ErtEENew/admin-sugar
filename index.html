@@ -3,67 +3,71 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>ENTITY TERMINAL | Secure Access</title>
+    <title>ENTITY TERMINAL | Advanced Sandbox</title>
     <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@700;900&family=Inter:wght@400;600&family=Rajdhani:wght@500;700&display=swap" rel="stylesheet">
     <style>
-        :root { --void-black: #020202; --entity-core: #0a0a0c; --blood-crimson: #9b0000; --flesh-ash: #2a2a2c; --fog-silver: #c4c4c5; --text-pure: #ffffff; --auric-gold: #cfaa4b; }
+        :root {
+            --void-black: #020202; --entity-core: #0a0a0c; --blood-crimson: #9b0000;
+            --flesh-ash: #2a2a2c; --fog-silver: #c4c4c5; --text-pure: #ffffff; --auric-gold: #cfaa4b;
+        }
         body { background-color: var(--void-black); color: var(--fog-silver); font-family: 'Inter', sans-serif; margin: 0; padding: 2rem; min-height: 100vh; display: flex; flex-direction: column; }
         h1, h2, h3, h4 { font-family: 'Cinzel', serif; color: var(--text-pure); text-transform: uppercase; }
         
-        /* LOGIN SCREEN */
-        #login-screen { flex: 1; display: flex; flex-direction: column; justify-content: center; align-items: center; height: 100%; }
-        .login-box { background: var(--entity-core); border: 1px solid var(--blood-crimson); padding: 3rem; text-align: center; box-shadow: 0 0 30px rgba(155, 0, 0, 0.2); width: 100%; max-width: 400px; }
-        .login-box h2 { margin-top: 0; letter-spacing: 0.1em; color: var(--blood-crimson); }
-        .login-box input { width: 100%; background: #111; border: 1px solid var(--flesh-ash); color: white; padding: 1rem; margin-bottom: 1rem; font-family: 'Inter', sans-serif; box-sizing: border-box; }
-        .login-box button { width: 100%; background: var(--blood-crimson); color: white; border: none; padding: 1rem; font-family: 'Rajdhani', sans-serif; font-size: 1.2rem; font-weight: bold; cursor: pointer; letter-spacing: 0.1em; transition: 0.3s; }
-        .login-box button:hover { background: #ff0000; box-shadow: 0 0 15px rgba(255, 0, 0, 0.5); }
+        #login-screen { flex: 1; display: flex; flex-direction: column; justify-content: center; align-items: center; }
+        .login-box { background: var(--entity-core); border: 1px solid var(--blood-crimson); padding: 3rem; text-align: center; max-width: 400px; width: 100%; box-shadow: 0 0 30px rgba(155, 0, 0, 0.2); }
+        .login-box input { width: 100%; background: #111; border: 1px solid var(--flesh-ash); color: white; padding: 1rem; margin-bottom: 1rem; box-sizing: border-box; }
+        .login-box button { width: 100%; background: var(--blood-crimson); color: white; border: none; padding: 1rem; font-family: 'Rajdhani'; font-size: 1.2rem; font-weight: bold; cursor: pointer; transition: 0.3s; }
+        .login-box button:hover { background: #ff0000; }
 
-        /* DASHBOARD */
         #admin-dashboard { display: none; }
         .header-bar { display: flex; justify-content: space-between; align-items: flex-end; border-bottom: 2px solid var(--blood-crimson); padding-bottom: 1rem; margin-bottom: 2rem; }
-        .header-bar h1 { margin: 0; }
         .btn-logout { background: transparent; color: var(--fog-silver); border: 1px solid var(--flesh-ash); padding: 0.5rem 1.5rem; cursor: pointer; font-family: 'Rajdhani'; font-weight: bold; }
         
-        .dashboard-grid { display: grid; grid-template-columns: 1fr 2.5fr; gap: 2rem; }
-        @media (max-width: 1000px) { .dashboard-grid { grid-template-columns: 1fr; } }
-        .panel { background: var(--entity-core); border: 1px solid var(--flesh-ash); padding: 1.5rem; border-radius: 4px; }
+        .dashboard-grid { display: grid; grid-template-columns: 300px 1fr; gap: 2rem; }
+        @media (max-width: 900px) { .dashboard-grid { grid-template-columns: 1fr; } }
+        
+        .panel { background: var(--entity-core); border: 1px solid var(--flesh-ash); padding: 1.5rem; }
         
         /* Players */
-        .player-list { list-style: none; padding: 0; margin: 1rem 0; max-height: 500px; overflow-y: auto; }
-        .player-item { display: flex; justify-content: space-between; align-items: center; padding: 0.75rem; border-bottom: 1px solid var(--flesh-ash); font-family: 'Rajdhani', sans-serif; font-size: 1.2rem; }
-        .btn-delete { background: var(--blood-crimson); color: white; border: none; padding: 0.5rem 1rem; cursor: pointer; font-family: 'Rajdhani'; font-weight: bold; }
-        .add-player-form { display: flex; gap: 1rem; margin-top: 1rem; }
-        .add-player-form input, .creator-form select { flex: 1; background: #111; border: 1px solid var(--flesh-ash); color: white; padding: 0.75rem; }
-        .btn-add { background: var(--flesh-ash); color: white; border: 1px solid var(--fog-silver); padding: 0.75rem 1.5rem; cursor: pointer; }
+        .add-player-form { display: flex; gap: 0.5rem; margin-bottom: 1rem; }
+        .add-player-form input { flex: 1; background: #111; border: 1px solid var(--flesh-ash); color: white; padding: 0.5rem; }
+        .btn-add { background: var(--flesh-ash); color: white; border: none; padding: 0.5rem 1rem; cursor: pointer; }
+        .player-list { list-style: none; padding: 0; margin: 0; max-height: 400px; overflow-y: auto; }
+        .player-item { display: flex; justify-content: space-between; padding: 0.5rem; border-bottom: 1px solid #1a1a1c; }
+        .btn-delete { background: var(--blood-crimson); color: white; border: none; cursor: pointer; }
+
+        /* Matches Sandbox */
+        .sandbox-controls { display: flex; gap: 1rem; margin-bottom: 2rem; padding-bottom: 1rem; border-bottom: 1px solid var(--flesh-ash); }
+        .btn-action { background: var(--blood-crimson); color: white; border: none; padding: 0.75rem 1.5rem; font-family: 'Rajdhani'; font-weight: bold; font-size: 1.1rem; cursor: pointer; letter-spacing: 0.05em; }
+        .btn-action.outline { background: transparent; border: 1px solid var(--fog-silver); color: white; }
         
-        /* Organic Match Creator */
-        .creator-form { display: grid; grid-template-columns: 1fr 2fr 2fr auto; gap: 1rem; background: #0c0c0e; border: 1px solid var(--blood-coagulated); padding: 1rem; margin-bottom: 2rem; align-items: center;}
-        .creator-form button { background: var(--blood-crimson); color: white; border: none; padding: 0.75rem 1.5rem; cursor: pointer; font-family: 'Rajdhani'; font-weight: bold; }
+        .round-container { background: #0c0c0e; border: 1px solid #1a1a1c; padding: 1.5rem; margin-bottom: 2rem; }
+        .round-header { display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid var(--flesh-ash); padding-bottom: 0.5rem; margin-bottom: 1.5rem; }
+        .round-header h3 { margin: 0; color: var(--fog-silver); }
         
-        /* Match Grid */
-        .round-section { margin-bottom: 2rem; background: #0c0c0e; border: 1px solid #1a1a1c; padding: 1rem; }
-        .round-section h3 { margin-top: 0; border-bottom: 1px solid var(--flesh-ash); padding-bottom: 0.5rem; color: var(--fog-silver); }
-        .match-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(300px, 1fr)); gap: 1rem; }
-        .match-card { background: #111; border: 1px solid var(--flesh-ash); padding: 1rem; position: relative; }
-        .match-card h4 { margin: 0 0 1rem 0; color: var(--auric-gold); font-size: 1.1rem; display: flex; justify-content: space-between;}
-        .btn-del-match { background: transparent; color: var(--blood-crimson); border: 1px solid var(--blood-crimson); padding: 0.2rem 0.5rem; cursor: pointer; font-size: 0.8rem;}
+        .match-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(320px, 1fr)); gap: 1.5rem; }
+        .match-card { background: #111; border: 1px solid #222; padding: 1rem; position: relative; }
+        .match-card-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 1rem; }
+        .match-card-header h4 { margin: 0; color: var(--auric-gold); }
         
-        .match-row { display: flex; gap: 0.5rem; margin-bottom: 0.5rem; align-items: center; }
-        .match-row select { flex: 2; background: #000; border: 1px solid #333; color: white; padding: 0.5rem; font-family: 'Inter'; font-size: 0.9rem;}
-        .match-row input[type="number"] { flex: 1; background: #000; border: 1px solid #333; color: white; padding: 0.5rem; text-align: center; }
-        .status-select { width: 100%; background: #000; border: 1px solid #333; color: white; padding: 0.5rem; margin-top: 0.5rem; }
-        .btn-save { background: transparent; border: 1px solid var(--auric-gold); color: var(--auric-gold); width: 100%; padding: 0.5rem; margin-top: 1rem; cursor: pointer; text-transform: uppercase; font-weight: bold; transition: 0.3s;}
-        .btn-save:hover { background: var(--auric-gold); color: black; }
-        .back-link { color: var(--fog-silver); text-decoration: none; font-family: 'Rajdhani'; font-size: 1.1rem; display: inline-block; margin-bottom: 1rem; }
+        .match-row { background: #050505; border: 1px solid #1a1a1c; padding: 0.5rem; margin-bottom: 0.5rem; }
+        .match-row label { display: block; font-size: 0.7rem; color: var(--text-muted); text-transform: uppercase; margin-bottom: 0.2rem; }
+        .input-group { display: flex; gap: 0.5rem; }
+        .input-group select { flex: 2; background: #111; border: 1px solid #333; color: white; padding: 0.4rem; font-family: 'Inter'; font-size: 0.85rem;}
+        .input-group input[type="number"] { flex: 1; background: #111; border: 1px solid #333; color: white; padding: 0.4rem; text-align: center; }
+        
+        .full-select { width: 100%; background: #111; border: 1px solid #333; color: white; padding: 0.5rem; margin-top: 0.5rem; font-family: 'Inter'; }
+        .btn-update { width: 100%; background: transparent; border: 1px solid var(--auric-gold); color: var(--auric-gold); padding: 0.75rem; margin-top: 1rem; cursor: pointer; font-weight: bold; transition: 0.3s; }
+        .btn-update:hover { background: var(--auric-gold); color: black; }
+        .btn-delete-match { background: transparent; color: var(--blood-crimson); border: none; cursor: pointer; font-size: 0.8rem; text-decoration: underline; }
     </style>
 </head>
 <body>
 
-    <a href="index.html" class="back-link" target="_blank">← Open Public Trial View</a>
-
+    <!-- LOGIN SCREEN -->
     <div id="login-screen">
         <div class="login-box">
-            <h2>Admin Authentication</h2>
+            <h2>Terminal Access</h2>
             <input type="email" id="login-email" placeholder="Email Address">
             <input type="password" id="login-password" placeholder="Password">
             <button id="login-btn">ENTER REALM</button>
@@ -71,268 +75,218 @@
         </div>
     </div>
 
+    <!-- ADMIN DASHBOARD -->
     <div id="admin-dashboard">
         <div class="header-bar">
-            <h1>Entity Control Terminal</h1>
-            <button id="logout-btn" class="btn-logout">DISCONNECT</button>
+            <h1>Entity Match Sandbox</h1>
+            <div>
+                <a href="index.html" target="_blank" style="color: var(--fog-silver); margin-right: 1rem; font-family: 'Rajdhani';">Open Public View ↗</a>
+                <button id="logout-btn" class="btn-logout">DISCONNECT</button>
+            </div>
         </div>
 
         <div class="dashboard-grid">
+            <!-- PLAYERS -->
             <div class="panel">
-                <h2>The Sacrifices</h2>
+                <h2>Roster</h2>
                 <div class="add-player-form">
-                    <input type="text" id="new-player-name" placeholder="Enter Survivor Name...">
-                    <button id="add-player-btn" class="btn-add">ADD</button>
+                    <input type="text" id="new-player-name" placeholder="Survivor Name">
+                    <button id="add-player-btn" class="btn-add">+</button>
                 </div>
                 <ul class="player-list" id="admin-player-list"></ul>
             </div>
 
+            <!-- MATCHES -->
             <div class="panel">
-                <h2>Organic Match Builder</h2>
-                <p style="color: var(--text-muted); font-size: 0.85rem; margin-bottom: 1rem;">
-                    Build the bracket dynamically. Add a match, assign it to a round, and select the participants.
-                </p>
-                
-                <!-- NEW DYNAMIC MATCH CREATOR -->
-                <div class="creator-form">
-                    <select id="create-round">
-                        <option value="1">Round 1</option>
-                        <option value="2">Round 2</option>
-                        <option value="3">Round 3 (Semi)</option>
-                        <option value="4">Round 4 (Finals)</option>
-                        <option value="5">Round 5</option>
-                    </select>
-                    <select id="create-p1" class="dynamic-player-select"></select>
-                    <select id="create-p2" class="dynamic-player-select"></select>
-                    <button id="btn-create-match">+ CREATE MATCH</button>
+                <h2>Dynamic Bracket Builder</h2>
+                <div class="sandbox-controls">
+                    <button id="add-round-btn" class="btn-action outline">+ ADD NEW ROUND</button>
+                    <button id="wipe-bracket-btn" style="background: transparent; border: none; color: var(--blood-crimson); cursor: pointer; text-decoration: underline; margin-left: auto;">⚠ Wipe All Matches</button>
                 </div>
-
-                <div id="admin-match-container"></div>
+                
+                <div id="sandbox-container"></div>
             </div>
         </div>
     </div>
 
+    <!-- FIREBASE LOGIC -->
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
-        import { getFirestore, collection, onSnapshot, doc, setDoc, deleteDoc, updateDoc } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
+        import { getFirestore, collection, onSnapshot, doc, setDoc, deleteDoc, updateDoc, writeBatch, getDocs } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
         import { getAuth, signInWithEmailAndPassword, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js";
 
-        // !!! PASTE YOUR FIREBASE CONFIG HERE !!!
+        // !!! PASTE YOUR CONFIG HERE !!!
         const firebaseConfig = {
-           
+
         };
 
         const app = initializeApp(firebaseConfig);
         const db = getFirestore(app);
         const auth = getAuth(app); 
 
-        const loginScreen = document.getElementById('login-screen');
-        const adminDashboard = document.getElementById('admin-dashboard');
-        
-        window.roster = []; 
-        window.currentMatches = [];
-        
+        window.players = ["TBD", "BYE"]; 
+        window.matches = [];
+
+        // Auth
         onAuthStateChanged(auth, (user) => {
-            if (user) {
-                loginScreen.style.display = 'none';
-                adminDashboard.style.display = 'block';
-                loadDashboardData(); 
-            } else {
-                loginScreen.style.display = 'flex';
-                adminDashboard.style.display = 'none';
-            }
+            if (user) { document.getElementById('login-screen').style.display = 'none'; document.getElementById('admin-dashboard').style.display = 'block'; loadData(); } 
+            else { document.getElementById('login-screen').style.display = 'flex'; document.getElementById('admin-dashboard').style.display = 'none'; }
         });
-
-        document.getElementById('login-btn').addEventListener('click', () => {
-            const email = document.getElementById('login-email').value;
-            const pass = document.getElementById('login-password').value;
-            signInWithEmailAndPassword(auth, email, pass).catch(() => {
-                document.getElementById('login-error').innerText = "Access Denied.";
-                document.getElementById('login-error').style.display = 'block';
-            });
-        });
-
+        document.getElementById('login-btn').addEventListener('click', () => signInWithEmailAndPassword(auth, document.getElementById('login-email').value, document.getElementById('login-password').value).catch(() => document.getElementById('login-error').style.display = 'block'));
         document.getElementById('logout-btn').addEventListener('click', () => signOut(auth));
 
-        function loadDashboardData() {
+        function loadData() {
+            // Players
             onSnapshot(collection(db, "players"), (snapshot) => {
-                const playerListEl = document.getElementById('admin-player-list');
-                playerListEl.innerHTML = '';
-                window.roster = [];
-
-                snapshot.forEach(docSnap => {
-                    const playerName = docSnap.id;
-                    window.roster.push(playerName);
-                    const li = document.createElement('li');
-                    li.className = 'player-item';
-                    li.innerHTML = `<span>${playerName}</span><button class="btn-delete" data-name="${playerName}">X</button>`;
-                    playerListEl.appendChild(li);
+                window.players = ["TBD", "BYE"];
+                const list = document.getElementById('admin-player-list');
+                list.innerHTML = '';
+                snapshot.forEach(d => {
+                    window.players.push(d.id);
+                    list.innerHTML += `<li class="player-item"><span>${d.id}</span> <button class="btn-delete" data-name="${d.id}">X</button></li>`;
                 });
-
-                document.querySelectorAll('.btn-delete').forEach(btn => {
-                    btn.addEventListener('click', async (e) => {
-                        const name = e.target.getAttribute('data-name');
-                        if(confirm(`Sacrifice ${name} to the void?`)) await deleteDoc(doc(db, "players", name));
-                    });
-                });
-                updateDropdowns();
+                document.querySelectorAll('.btn-delete').forEach(b => b.addEventListener('click', async (e) => await deleteDoc(doc(db, "players", e.target.dataset.name))));
+                renderSandbox();
             });
 
             document.getElementById('add-player-btn').addEventListener('click', async () => {
-                const input = document.getElementById('new-player-name');
-                const name = input.value.trim();
-                if (name === "") return;
-                await setDoc(doc(db, "players", name), { name: name });
-                input.value = ''; 
+                const name = document.getElementById('new-player-name').value.trim();
+                if(name) { await setDoc(doc(db, "players", name), {name}); document.getElementById('new-player-name').value = ''; }
             });
 
+            // Matches
             onSnapshot(collection(db, "matches"), (snapshot) => {
-                window.currentMatches = snapshot.docs.map(d => d.data());
-                updateDropdowns();
-                renderMatchesUI();
+                window.matches = snapshot.docs.map(d => d.data());
+                renderSandbox();
             });
         }
 
-        // Generate the HTML for the dropdowns (combining Players and Match Winners)
-        function generateDropdownHTML(selectedValue = "") {
-            let html = `<option value="">-- Select Source --</option>`;
-            html += `<optgroup label="Static Slots">`;
-            html += `<option value="TBD" ${selectedValue === 'TBD' ? 'selected' : ''}>TBD</option>`;
-            html += `<option value="BYE" ${selectedValue === 'BYE' ? 'selected' : ''}>BYE (Free Win)</option>`;
-            html += `</optgroup><optgroup label="Registered Players">`;
-            window.roster.forEach(p => {
-                html += `<option value="${p}" ${selectedValue === p ? 'selected' : ''}>${p}</option>`;
-            });
-            html += `</optgroup><optgroup label="Match Winners (Dynamic)">`;
+        // SANDBOX RENDERER
+        function renderSandbox() {
+            const container = document.getElementById('sandbox-container');
+            container.innerHTML = '';
             
-            // Sort matches to display neatly
-            let sortedM = [...window.currentMatches].sort((a,b) => parseInt(a.id.substring(1)) - parseInt(b.id.substring(1)));
-            sortedM.forEach(m => {
-                html += `<option value="match:${m.id}" ${selectedValue === `match:${m.id}` ? 'selected' : ''}>Winner of Match ${m.id.substring(1)}</option>`;
-            });
-            html += `</optgroup>`;
-            return html;
+            if(!window.matches.length) {
+                container.innerHTML = '<p style="color: #666;">No matches exist. Add a round to begin building.</p>';
+                return;
+            }
+
+            // Determine max round to know how many containers to draw
+            const maxRound = Math.max(...window.matches.map(m => m.round));
+            
+            // Build Match Dropdown Options (for drawing lines)
+            const matchOptions = `<option value="">-- No Connecting Line --</option>` + 
+                window.matches.sort((a,b) => a.round - b.round).map(m => `<option value="${m.id}">Feeds from Match ${m.id.substring(1)} (R${m.round})</option>`).join('');
+
+            // Draw each round
+            for(let r = 1; r <= maxRound; r++) {
+                const roundMatches = window.matches.filter(m => m.round === r).sort((a,b) => parseInt(a.id.substring(1)) - parseInt(b.id.substring(1)));
+                
+                let html = `
+                <div class="round-container">
+                    <div class="round-header">
+                        <h3>Round ${r}</h3>
+                        <button class="btn-add-match btn-action" data-round="${r}">+ ADD MATCH TO R${r}</button>
+                    </div>
+                    <div class="match-grid">
+                `;
+
+                roundMatches.forEach(match => {
+                    const p1Opts = window.players.map(p => `<option value="${p}" ${match.p1 === p ? 'selected':''}>${p}</option>`).join('');
+                    const p2Opts = window.players.map(p => `<option value="${p}" ${match.p2 === p ? 'selected':''}>${p}</option>`).join('');
+                    
+                    html += `
+                        <div class="match-card">
+                            <div class="match-card-header">
+                                <h4>Match ${match.id.substring(1)}</h4>
+                                <button class="btn-delete-match" data-id="${match.id}">Delete</button>
+                            </div>
+                            
+                            <div class="match-row">
+                                <label>Participant 1</label>
+                                <div class="input-group">
+                                    <select id="${match.id}-p1">${p1Opts}</select>
+                                    <input type="number" id="${match.id}-s1" value="${match.s1}">
+                                </div>
+                                <select id="${match.id}-p1-source" class="full-select" style="margin-top:0.3rem;">
+                                    ${matchOptions.replace(`value="${match.p1_source}"`, `value="${match.p1_source}" selected`)}
+                                </select>
+                            </div>
+
+                            <div class="match-row">
+                                <label>Participant 2</label>
+                                <div class="input-group">
+                                    <select id="${match.id}-p2">${p2Opts}</select>
+                                    <input type="number" id="${match.id}-s2" value="${match.s2}">
+                                </div>
+                                <select id="${match.id}-p2-source" class="full-select" style="margin-top:0.3rem;">
+                                    ${matchOptions.replace(`value="${match.p2_source}"`, `value="${match.p2_source}" selected`)}
+                                </select>
+                            </div>
+
+                            <select id="${match.id}-state" class="full-select">
+                                <option value="upcoming" ${match.state === 'upcoming'?'selected':''}>Status: Upcoming (No Outline)</option>
+                                <option value="pending" ${match.state === 'pending'?'selected':''}>Status: Active (Red Outline)</option>
+                                <option value="complete" ${match.state === 'complete'?'selected':''}>Status: Complete (Gold Highlights)</option>
+                            </select>
+                            
+                            <button class="btn-update" data-id="${match.id}">SAVE MATCH</button>
+                        </div>
+                    `;
+                });
+
+                html += `</div></div>`;
+                container.innerHTML += html;
+            }
+
+            // Attach Event Listeners
+            document.querySelectorAll('.btn-add-match').forEach(b => b.addEventListener('click', createMatch));
+            document.querySelectorAll('.btn-update').forEach(b => b.addEventListener('click', updateMatch));
+            document.querySelectorAll('.btn-delete-match').forEach(b => b.addEventListener('click', deleteMatch));
         }
 
-        function updateDropdowns() {
-            document.querySelectorAll('.dynamic-player-select').forEach(select => {
-                const currentVal = select.value;
-                select.innerHTML = generateDropdownHTML(currentVal);
-            });
-        }
-
-        // CREATE NEW MATCH LOGIC
-        document.getElementById('btn-create-match').addEventListener('click', async () => {
-            const round = parseInt(document.getElementById('create-round').value);
-            const p1Source = document.getElementById('create-p1').value || "TBD";
-            const p2Source = document.getElementById('create-p2').value || "TBD";
-
-            // Find the highest current match ID number
-            let maxId = 0;
-            window.currentMatches.forEach(m => {
-                const num = parseInt(m.id.substring(1));
-                if (num > maxId) maxId = num;
-            });
-            const newId = `m${maxId + 1}`;
-
-            const matchData = {
-                id: newId,
-                round: round,
-                p1: p1Source.startsWith("match:") ? "TBD" : p1Source,
-                parent1: p1Source.startsWith("match:") ? p1Source.split(":")[1] : null,
-                p2: p2Source.startsWith("match:") ? "TBD" : p2Source,
-                parent2: p2Source.startsWith("match:") ? p2Source.split(":")[1] : null,
-                s1: 0, s2: 0, state: "upcoming"
-            };
-
-            await setDoc(doc(db, "matches", newId), matchData);
+        // SANDBOX ACTIONS
+        document.getElementById('add-round-btn').addEventListener('click', () => {
+            const nextRound = window.matches.length ? Math.max(...window.matches.map(m => m.round)) + 1 : 1;
+            createMatch({ target: { dataset: { round: nextRound } } });
         });
 
-        function renderMatchesUI() {
-            const container = document.getElementById('admin-match-container');
-            container.innerHTML = '';
-
-            let matches = [...window.currentMatches];
-            matches.sort((a, b) => parseInt(a.id.substring(1)) - parseInt(b.id.substring(1)));
-
-            const rounds = {};
-            matches.forEach(m => {
-                if(!rounds[m.round]) rounds[m.round] = [];
-                rounds[m.round].push(m);
-            });
-
-            Object.keys(rounds).sort((a,b) => a - b).forEach(roundNum => {
-                const roundDiv = document.createElement('div');
-                roundDiv.className = 'round-section';
-                roundDiv.innerHTML = `<h3>Round ${roundNum}</h3>`;
-                
-                const grid = document.createElement('div');
-                grid.className = 'match-grid';
-                
-                rounds[roundNum].forEach(match => {
-                    const card = document.createElement('div');
-                    card.className = 'match-card';
-                    
-                    // Reconstruct the original selected value for the dropdowns
-                    const p1Value = match.parent1 ? `match:${match.parent1}` : match.p1;
-                    const p2Value = match.parent2 ? `match:${match.parent2}` : match.p2;
-
-                    card.innerHTML = `
-                        <h4>Match ${match.id.substring(1)} <button class="btn-del-match" data-id="${match.id}">DELETE</button></h4>
-                        <div class="match-row">
-                            <select id="${match.id}-p1" class="dynamic-player-select">${generateDropdownHTML(p1Value)}</select>
-                            <input type="number" id="${match.id}-s1" value="${match.s1}">
-                        </div>
-                        <div class="match-row">
-                            <select id="${match.id}-p2" class="dynamic-player-select">${generateDropdownHTML(p2Value)}</select>
-                            <input type="number" id="${match.id}-s2" value="${match.s2}">
-                        </div>
-                        <select id="${match.id}-state" class="status-select">
-                            <option value="upcoming" ${match.state === 'upcoming' ? 'selected' : ''}>Status: Upcoming (No Line)</option>
-                            <option value="pending" ${match.state === 'pending' ? 'selected' : ''}>Status: Pending (Red Line)</option>
-                            <option value="complete" ${match.state === 'complete' ? 'selected' : ''}>Status: Complete (Highlight Winner)</option>
-                        </select>
-                        <button class="btn-save" data-id="${match.id}">Update Match</button>
-                    `;
-                    grid.appendChild(card);
-                });
-                
-                roundDiv.appendChild(grid);
-                container.appendChild(roundDiv);
-            });
-
-            // Delete Match
-            document.querySelectorAll('.btn-del-match').forEach(btn => {
-                btn.addEventListener('click', async (e) => {
-                    const id = e.target.getAttribute('data-id');
-                    if(confirm(`Erase Match ${id.substring(1)}?`)) await deleteDoc(doc(db, "matches", id));
-                });
-            });
-
-            // Update Match Data
-            document.querySelectorAll('.btn-save').forEach(btn => {
-                btn.addEventListener('click', async (e) => {
-                    const id = e.target.getAttribute('data-id');
-                    
-                    const p1Raw = document.getElementById(`${id}-p1`).value;
-                    const p2Raw = document.getElementById(`${id}-p2`).value;
-
-                    const updatedData = {
-                        p1: p1Raw.startsWith("match:") ? "TBD" : p1Raw,
-                        parent1: p1Raw.startsWith("match:") ? p1Raw.split(":")[1] : null,
-                        p2: p2Raw.startsWith("match:") ? "TBD" : p2Raw,
-                        parent2: p2Raw.startsWith("match:") ? p2Raw.split(":")[1] : null,
-                        s1: parseInt(document.getElementById(`${id}-s1`).value) || 0,
-                        s2: parseInt(document.getElementById(`${id}-s2`).value) || 0,
-                        state: document.getElementById(`${id}-state`).value
-                    };
-                    
-                    await updateDoc(doc(db, "matches", id), updatedData);
-                    e.target.innerText = "SAVED!";
-                    setTimeout(() => e.target.innerText = "Update Match", 1000);
-                });
+        async function createMatch(e) {
+            const round = parseInt(e.target.dataset.round);
+            const nextId = "m" + (window.matches.length ? Math.max(...window.matches.map(m => parseInt(m.id.substring(1)))) + 1 : 1);
+            
+            await setDoc(doc(db, "matches", nextId), {
+                id: nextId, round: round,
+                p1: "TBD", p1_source: "", s1: 0,
+                p2: "TBD", p2_source: "", s2: 0,
+                state: "upcoming"
             });
         }
+
+        async function updateMatch(e) {
+            const id = e.target.dataset.id;
+            await updateDoc(doc(db, "matches", id), {
+                p1: document.getElementById(`${id}-p1`).value,
+                p1_source: document.getElementById(`${id}-p1-source`).value,
+                s1: parseInt(document.getElementById(`${id}-s1`).value) || 0,
+                p2: document.getElementById(`${id}-p2`).value,
+                p2_source: document.getElementById(`${id}-p2-source`).value,
+                s2: parseInt(document.getElementById(`${id}-s2`).value) || 0,
+                state: document.getElementById(`${id}-state`).value
+            });
+            e.target.innerText = "SAVED!"; setTimeout(() => e.target.innerText = "SAVE MATCH", 1000);
+        }
+
+        async function deleteMatch(e) {
+            if(confirm("Delete this match?")) await deleteDoc(doc(db, "matches", e.target.dataset.id));
+        }
+
+        document.getElementById('wipe-bracket-btn').addEventListener('click', async () => {
+            if(!confirm("DANGER: This wipes every match permanently. Proceed?")) return;
+            const batch = writeBatch(db);
+            window.matches.forEach(m => batch.delete(doc(db, "matches", m.id)));
+            await batch.commit();
+        });
     </script>
 </body>
 </html>
