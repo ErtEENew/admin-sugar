@@ -183,7 +183,15 @@
 
             <!-- MATCH MANAGEMENT -->
             <div class="panel">
-                <h2>Blood Web Configuration</h2>
+                <div style="display: flex; justify-content: space-between; align-items: center;">
+                    <h2>Blood Web Configuration</h2>
+                    <button id="generate-bracket-btn" style="background: var(--blood-crimson); color: white; border: none; padding: 0.75rem 1.5rem; cursor: pointer; font-family: 'Rajdhani'; font-weight: bold; letter-spacing: 0.1em;">
+                        GENERATE DYNAMIC BRACKET
+                    </button>
+                </div>
+                <p style="color: var(--text-muted); font-size: 0.85rem; margin-bottom: 1rem;">
+                    Clicking Generate will delete current matches, calculate the current players list, assign BYEs, and generate a new bracket tree.
+                </p>
                 <div class="match-grid" id="admin-match-grid"></div>
             </div>
         </div>
@@ -192,8 +200,7 @@
     <!-- FIREBASE LOGIC -->
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
-        import { getFirestore, collection, onSnapshot, doc, setDoc, deleteDoc, updateDoc } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
-        // IMPORT AUTHENTICATION MODULES
+        import { getFirestore, collection, onSnapshot, doc, setDoc, deleteDoc, updateDoc, getDocs, writeBatch } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";        // IMPORT AUTHENTICATION MODULES
         import { getAuth, signInWithEmailAndPassword, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js";
 
         // !!! PASTE YOUR EXACT FIREBASE CONFIG HERE !!!
@@ -353,6 +360,106 @@
                 });
             });
         }
+        // ==========================================
+        // DYNAMIC BRACKET GENERATOR
+        // ==========================================
+        document.getElementById('generate-bracket-btn').addEventListener('click', async () => {
+            if(!confirm("WARNING: This will erase the current bracket and generate a new one based on the exact players currently listed. Proceed?")) return;
+
+            // 1. Get current players from the UI list
+            const playerNodes = document.querySelectorAll('.player-item span');
+            let players = Array.from(playerNodes).map(span => span.innerText);
+
+            if(players.length < 2) {
+                return alert("The Entity requires at least 2 sacrifices to form a Web.");
+            }
+
+            // Optional: Shuffle the players randomly for seeding
+            players.sort(() => Math.random() - 0.5);
+
+            // 2. Calculate nearest power of 2 (2, 4, 8, 16, 32...)
+            let bracketSize = 1;
+            while(bracketSize < players.length) bracketSize *= 2;
+            const byes = bracketSize - players.length;
+
+            // Pad the roster with BYEs
+            for(let i=0; i < byes; i++) players.push("BYE");
+
+            const matches = [];
+            let matchCounter = 1;
+
+            // 3. Generate Round 1 (Leaves of the tree)
+            let currentRoundMatches = [];
+            for(let i=0; i < bracketSize; i += 2) {
+                const isBye = players[i+1] === "BYE"; // If player 2 is a BYE, Player 1 auto-wins
+                currentRoundMatches.push({
+                    id: `m${matchCounter}`,
+                    round: 1,
+                    p1: players[i],
+                    p2: players[i+1],
+                    s1: isBye ? 1 : 0, 
+                    s2: 0,
+                    state: isBye ? "complete" : "upcoming",
+                    parent1: null,
+                    parent2: null
+                });
+                matchCounter++;
+            }
+            matches.push(...currentRoundMatches);
+
+            // 4. Generate Subsequent Rounds (converging to the Final)
+            let roundNum = 2;
+            while(currentRoundMatches.length > 1) {
+                const nextRoundMatches = [];
+                for(let i=0; i < currentRoundMatches.length; i += 2) {
+                    const m1 = currentRoundMatches[i];
+                    const m2 = currentRoundMatches[i+1];
+
+                    // If a previous match was an auto-bye, advance the real player's name
+                    let p1 = "TBD";
+                    if (m1.p2 === "BYE") p1 = m1.p1;
+                    
+                    let p2 = "TBD";
+                    if (m2.p2 === "BYE") p2 = m2.p1;
+
+                    nextRoundMatches.push({
+                        id: `m${matchCounter}`,
+                        round: roundNum,
+                        p1: p1,
+                        p2: p2,
+                        s1: 0,
+                        s2: 0,
+                        state: "upcoming",
+                        parent1: m1.id,  // Links to left branch
+                        parent2: m2.id   // Links to right branch
+                    });
+                    matchCounter++;
+                }
+                matches.push(...nextRoundMatches);
+                currentRoundMatches = nextRoundMatches;
+                roundNum++;
+            }
+
+            // 5. Upload new configuration to Firebase
+            try {
+                const batch = writeBatch(db);
+                
+                // Clear old matches
+                const snapshot = await getDocs(collection(db, "matches"));
+                snapshot.docs.forEach(docSnap => batch.delete(docSnap.ref));
+
+                // Write new matches
+                matches.forEach(m => {
+                    batch.set(doc(db, "matches", m.id), m);
+                });
+
+                await batch.commit();
+                alert("The Entity accepts the new parameters. Dynamic bracket generated!");
+            } catch (error) {
+                console.error("Error generating bracket:", error);
+                alert("Failed to generate bracket.");
+            }
+        });
     </script>
 </body>
 </html>
